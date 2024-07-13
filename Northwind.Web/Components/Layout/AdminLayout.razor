@@ -1,0 +1,12 @@
+@using Microsoft.AspNetCore.Components.Authorization
+@inherits LayoutComponentBase
+@layout MainLayout
+
+<AuthorizeView Roles="Administrator">
+    <NotAuthorized>
+        You must be Administrator to access this page.
+    </NotAuthorized>
+    <Authorized>
+        @Body
+    </Authorized>
+</AuthorizeView>

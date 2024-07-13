@@ -1,0 +1,129 @@
+﻿@page "/weather"
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.WebUtilities
+@* @attribute [StreamRendering] *@
+@inject NavigationManager NavManager
+@layout Layout.AdminLayout
+@attribute [Authorize]
+
+
+<PageTitle>Weather</PageTitle>
+
+<h1>Weather</h1>
+
+<p>This component demonstrates showing data.</p>
+
+@* <div class="weatherlist" hx-get="/weatherlisting" hx-trigger="load"
+hx-swap="innerHTML"><strong>Loading...</strong></div> *@
+<div class="accordion" id="accordionExample">
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button id="button-1" hx-get="/weatherlisting" hx-swap="innerHTML" hx-target="#weatherBody-1"
+                class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-1"
+                aria-expanded="true" aria-controls="collapse-1">
+                Accordion Item #1
+            </button>
+        </h2>
+        <div id="collapse-1" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+            <div id="weatherBody-1" class="accordion-body weatherlist">
+                <div>
+                    <em>Loading...</em>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button id="button-2" hx-get="/weatherlisting" hx-swap="innerHTML" hx-target="#weatherBody-2"
+                class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-2"
+                aria-expanded="false" aria-controls="collapse-2">
+                Accordion Item #2
+            </button>
+        </h2>
+        <div id="collapse-2" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+            <div id="weatherBody-2" class="accordion-body weatherlist">
+                <div>
+                    <em>Loading...</em>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button id="button-3" hx-get="/weatherlisting" hx-swap="innerHTML" hx-target="#weatherBody-3"
+                class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-3"
+                aria-expanded="false" aria-controls="collapse-3">
+                Accordion Item #3
+            </button>
+        </h2>
+        <div id="collapse-3" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+            <div id="weatherBody-3" class="accordion-body weatherlist">
+                <div>
+                    <em>Loading...</em>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    const accordiansLoaded = [];
+
+    let accordianButtons = document.querySelectorAll(".accordion-button");
+
+    accordianButtons.forEach(function (elem) {
+        elem.addEventListener('htmx:beforeRequest', function (evt) {
+            if (accordiansLoaded.indexOf(evt.srcElement.id) > -1) {
+                event.preventDefault();
+            }
+        });
+        elem.addEventListener('htmx:afterRequest', function (evt) {
+            accordiansLoaded.push(evt.srcElement.id);
+        });
+    });
+
+    let accordianBodys = document.querySelectorAll(".accordion-body");
+
+    accordianBodys.forEach(function (elem) {
+        elem.addEventListener('htmx:beforeSwap', function (evt) {
+            htmx.addClass(evt.srcElement, 'loading');
+        });
+        elem.addEventListener('htmx:afterSwap', function (evt) {
+            htmx.removeClass(evt.srcElement, 'loading', 100);
+            localStorage.setItem("weatherAccordionFocussed", evt.srcElement.id.split('-')[1]);
+        });
+    });
+
+    var accordianLasShown = localStorage.getItem("weatherAccordionFocussed") ?? "1";
+    var weatherBody = `#weatherBody-${accordianLasShown}`;
+    var weatherAccordionContent = `#collapse-${accordianLasShown}`;
+    htmx.ajax('GET', '/weatherlisting', { target: weatherBody, swap: 'innerHTML' });
+    accordiansLoaded.push(`button-${accordianLasShown}`);
+    var cOne = new bootstrap.Collapse(document.querySelector(weatherAccordionContent));
+
+
+    @* document.getElementById("button1").addEventListener('htmx:beforeRequest', function (evt) {
+        if(accorian1Loaded){
+        evt.preventDefault();
+        }
+        else{
+        accorian1Loaded = true;
+        }
+        }); *@
+        @* document.getElementById("button2").addEventListener('htmx:beforeRequest', function (evt) {
+        if(accorian2Loaded){
+        evt.preventDefault();
+        }
+        else{
+        accorian2Loaded = true;
+        }
+        });
+        document.getElementById("button3").addEventListener('htmx:beforeRequest', function (evt) {
+        if(accorian3Loaded){
+        evt.preventDefault();
+        }
+        else{
+        accorian3Loaded = true;
+        }
+        }); *@
+</script>
